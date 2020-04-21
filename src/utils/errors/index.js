@@ -39,6 +39,15 @@ class ValidateError extends ExtendableError {
 	}
 }
 
+class RedisError extends ExtendableError {
+	constructor(error, message, details) {
+		super(error, message, details);
+		this.status = 503;
+		this.details = details || {};
+		this.message = message || 'Redis error occurred';
+	}
+}
+
 class SystemError extends ExtendableError {
 	constructor(error, message, details) {
 		super(error, message, details);
@@ -49,4 +58,4 @@ class SystemError extends ExtendableError {
 	}
 }
 
-export {SystemError, UserNotExist, IncorrectPassword, ValidateError}
+export {SystemError, UserNotExist, IncorrectPassword, ValidateError, RedisError}

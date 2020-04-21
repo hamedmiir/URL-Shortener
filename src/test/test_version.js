@@ -5,7 +5,6 @@ const chaiSubset = require('chai-subset');
 import { Given } from 'rest-bdd-testing';
 
 import app from '../app';
-import { getMarkdownFileName } from './helpers';
 const packageJson = require('../../package.json');
 
 
@@ -27,8 +26,7 @@ describe('GET /apiv1/version', function() {
 
     it('should GET the version', async function() {
         given = new Given(server, 'Get version', 'Getting version', {
-            url: '/apiv1/version',
-            autodoc: getMarkdownFileName
+            url: '/apiv1/version'
         });
 
         const fulfilledGiven = await given.requestBaseCall();

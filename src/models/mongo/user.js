@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import {IncorrectPassword, UserNotExist} from "../utils/errors";
 
-let UserSchema = new mongoose.Schema({
+import {IncorrectPassword, UserNotExist} from "../../utils/errors";
+const Schema = mongoose.Schema;
+
+let UserSchema = new Schema({
 	userName: {
 		type: String,
 		required: true,
@@ -25,7 +26,13 @@ let UserSchema = new mongoose.Schema({
 			type: String,
 			required: true
 		}
+	}],
+	urls: [{
+		type: Schema.Types.ObjectId,
+		ref: 'UrlObject'
 	}]
+}, {
+	timestamp: true
 });
 
 UserSchema.index({userName: 1}, { unique: true });
@@ -36,21 +43,11 @@ UserSchema.path('email').validate(email => {
 });
 
 // UserSchema.pre('save', async (next) => {
-//
 // 	const user = this;
-// 	console.log('user\n', user);
 // 	if (user.isModified('password'))
 // 		user.password = await bcrypt.hash(user.password,10);
 // 	next();
 // });
-
-UserSchema.methods.generateAuthToken = async () => {
-	const user = this;
-	const token = jwt.sign({_id: user._id}, process.env.JWT_KEY);
-	user.tokens.concat({token});
-	await user.save();
-	return token;
-};
 
 UserSchema.statics.loginByEmail = async (email, password) => {
 	const user = await User.findOne({email});
@@ -58,7 +55,7 @@ UserSchema.statics.loginByEmail = async (email, password) => {
 		throw new UserNotExist('', 'Not found any user with this email address', {
 			email
 		});
-	const isPasswordMatch = await bcrypt.compare(password, user.password)
+	const isPasswordMatch = await bcrypt.compare(password, user.password);
 	if (!isPasswordMatch)
 		throw new IncorrectPassword();
 	return user;
